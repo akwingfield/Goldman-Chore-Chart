@@ -2,7 +2,7 @@
   "name": "Family Chore Champions",
   "short_name": "Chore Chart",
   "description": "Family chore chart with stars and rewards",
-  "start_url": "/FamilyChoreChart.html",
+  "start_url": "/Goldman-Chore-Chart/"
   "display": "standalone",
   "background_color": "#fdf6ec",
   "theme_color": "#1a5276",
