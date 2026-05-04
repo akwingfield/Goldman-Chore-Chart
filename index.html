@@ -17,8 +17,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hdr{background:linear-gradient(135deg,#1a5276,#7d3c98);padding:24px 20px 18px;text-align:center;margin-bottom:18px;border-radius:0 0 20px 20px;box-shadow:0 4px 20px rgba(0,0,0,0.18)}
 .hdr h1{font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:1px}
 .hdr p{font-size:14px;color:rgba(255,255,255,0.78)}
-.tabs{display:flex;gap:8px;justify-content:center;margin-top:14px}
-.tab{padding:7px 20px;border-radius:99px;border:2px solid rgba(255,255,255,0.55);background:transparent;color:rgba(255,255,255,0.88);font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;transition:all 0.2s}
+.tabs{display:flex;gap:6px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:99px;border:2px solid rgba(255,255,255,0.55);background:transparent;color:rgba(255,255,255,0.88);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;transition:all 0.2s}
 .tab.active{background:#fff;color:#7d3c98;border-color:#fff}
 .tab:hover:not(.active){background:rgba(255,255,255,0.15)}
 .scorerow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
@@ -33,7 +33,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sbar{height:5px;border-radius:99px;background:#f0f0f0;margin-top:7px;overflow:hidden}
 .sbar-fill{height:100%;border-radius:99px;transition:width 0.5s}
 .dayrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.daybtn{padding:8px 13px;border-radius:99px;border:2px solid #e0e0e0;background:#fff;color:#666;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;-webkit-tap-highlight-color:transparent;min-height:44px}
+.daybtn{padding:8px 10px;border-radius:99px;border:2px solid #e0e0e0;background:#fff;color:#666;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;-webkit-tap-highlight-color:transparent;min-height:44px}
 .daybtn.active{background:#7d3c98;border-color:#7d3c98;color:#fff}
 .prog{background:#fff;border-radius:12px;padding:11px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
 .prog-bar{flex:1;height:9px;background:#f0f0f0;border-radius:99px;overflow:hidden}
@@ -85,18 +85,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .reminder-close{background:rgba(255,255,255,0.25);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .save-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:12px;border:2px dashed #7d3c98;background:transparent;color:#7d3c98;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:16px;transition:all 0.2s}
 .save-btn:hover{background:#f3eafd}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;margin-left:6px}
+.sync-dot.syncing{background:#f59e0b;animation:pulse 1s infinite}
+.sync-dot.error{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:20px;padding:24px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:18px;font-weight:800;color:#333;margin-bottom:16px}
+.admin-chore-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f9f9f9;border-radius:10px;margin-bottom:6px;border:1px solid #eee}
+.admin-input{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #ddd;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px}
+.admin-input:focus{border-color:#7d3c98}
+.admin-btn{padding:10px 18px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.admin-btn.primary{background:#7d3c98;color:#fff}
+.admin-btn.danger{background:#fee2e2;color:#dc2626}
+.admin-btn.success{background:#dcfce7;color:#15803d}
 @media(max-width:480px){.scorerow{grid-template-columns:repeat(2,1fr)}.hdr h1{font-size:20px}.lbar-wrap{width:70px}}
 </style>
 </head>
 <body>
 <div class="hdr">
   <h1>🏠 Family Chore Champions</h1>
-  <p>Check off chores &middot; earn stars &middot; unlock rewards!</p>
+  <p>Check off chores &middot; earn stars &middot; unlock rewards! <span class="sync-dot" id="sync-dot" title="Sync status"></span></p>
   <div class="week-label" id="week-label"></div>
   <div class="tabs">
     <button class="tab active" onclick="showTab('chart')">📋 Chart</button>
-    <button class="tab" onclick="showTab('board')">🏆 Leaderboard</button>
+    <button class="tab" onclick="showTab('board')">🏆 Board</button>
     <button class="tab" onclick="showTab('rewards')">🎁 Rewards</button>
+    <button class="tab" onclick="showAdminLogin()">⚙️ Admin</button>
   </div>
 </div>
 <div class="wrap">
@@ -117,9 +132,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="leader-card" id="leaderboard"></div>
     <div class="info-box">
       ⭐ Each completed chore earns <strong>1 star</strong><br>
-      Stars accumulate all week — they don't reset!<br>
-      🏆 First to <strong>70 stars</strong> wins the weekly champion title!<br>
-      💰 Complete <strong>every chore all week</strong> to earn your allowance!
+      Stars carry over week to week!<br>
+      💰 Complete <strong>every chore all week</strong> to earn your allowance!<br>
       🔥 Complete all your chores 2+ days in a row for a streak badge
     </div>
   </div>
@@ -128,7 +142,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div id="modal-container"></div>
+
 <script>
+// ── SUPABASE CONFIG ──────────────────────────────────────────
+const SUPABASE_URL='https://kytthidfvrlflwxlmtuq.supabase.co';
+const SUPABASE_KEY='sb_publishable_z1WLOEagUjwQpkowGxObaQ_p4F9nKPB';
+const TABLE='chore_state';
+const ROW_ID=1;
+
+// ── CONSTANTS ────────────────────────────────────────────────
+const ADMIN_PASSWORD='Goldman2024!';
 const KIDS=[
   {name:"Truman",   age:6,  color:"#1a5276",light:"#d6eaf8"},
   {name:"Abby",     age:10, color:"#c0185a",light:"#fadadd"},
@@ -138,12 +162,32 @@ const KIDS=[
 const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const THRESHOLDS=[
   {stars:50, reward:"Choose tonight's movie or show 🎬"},
-  {stars:75,reward:"Stay up 30 minutes late 🌙"},
+  {stars:75, reward:"Stay up 30 minutes late 🌙"},
   {stars:100,reward:"$5 to spend however you want 💵"},
   {stars:150,reward:"Special outing — you choose! 🎉"},
   {stars:300,reward:"Big reward — you pick! 🏆"},
 ];
-const CHORES={
+const WEEKEND_DAYS=["Saturday","Sunday"];
+const EMOJIS=["⭐","🌟","✨","🎉","🏆","🔥","💫","🎊"];
+
+// ── DEFAULT CHORES ───────────────────────────────────────────
+const DEFAULT_CHORES={
+  Sunday:[
+    {text:"Tidy bathrooms – pick up clothes, put away stuff on counters, wipe counters",kid:"Elizabeth"},
+    {text:"Empty stair basket, put away anything on the stairs, swiffer stairs",kid:"Elizabeth"},
+    {text:"Take out trash and recycling",kid:"Elizabeth"},
+    {text:"Empty and fill dishwasher",kid:"Jack"},
+    {text:"Scoop litter box and clean up cat space (upstairs bathroom – sweep floor, tidy up, mop any messes)",kid:"Jack"},
+    {text:"Tidy Hallway and Dining Room, sweep floor",kid:"Jack"},
+    {text:"Scoop litter box and tidy up laundry room – hang up bags, put away shoes, sweep",kid:"Abby"},
+    {text:"Tidy Kitchen",kid:"Abby"},
+    {text:"Clean off and wipe down kitchen countertops",kid:"Abby"},
+    {text:"Sweep kitchen floor",kid:"Abby"},
+    {text:"Pool Skimmers",kid:"Truman"},
+    {text:"Water Flowers",kid:"Truman"},
+    {text:"Tidy living room, sweep floor",kid:"Truman"},
+    {text:"Empty silverware and plastic cups from dishwasher (evening)",kid:"Truman"},
+  ],
   Monday:[
     {text:"Tidy bathrooms – pick up clothes, put away stuff on counters, wipe counters, empty trash",kid:"Truman"},
     {text:"Empty stair basket, put away anything on the stairs, swiffer stairs",kid:"Truman"},
@@ -224,70 +268,206 @@ const CHORES={
     {text:"Water Flowers",kid:"Jack"},
     {text:"Tidy living room, sweep floor",kid:"Jack"},
   ],
-  Sunday:[
-    {text:"Tidy bathrooms – pick up clothes, put away stuff on counters, wipe counters",kid:"Elizabeth"},
-    {text:"Empty stair basket, put away anything on the stairs, swiffer stairs",kid:"Elizabeth"},
-    {text:"Take out trash and recycling",kid:"Elizabeth"},
-    {text:"Empty and fill dishwasher",kid:"Jack"},
-    {text:"Scoop litter box and clean up cat space (upstairs bathroom – sweep floor, tidy up, mop any messes)",kid:"Jack"},
-    {text:"Tidy Hallway and Dining Room, sweep floor",kid:"Jack"},
-    {text:"Scoop litter box and tidy up laundry room – hang up bags, put away shoes, sweep",kid:"Abby"},
-    {text:"Tidy Kitchen",kid:"Abby"},
-    {text:"Clean off and wipe down kitchen countertops",kid:"Abby"},
-    {text:"Sweep kitchen floor",kid:"Abby"},
-    {text:"Pool Skimmers",kid:"Truman"},
-    {text:"Water Flowers",kid:"Truman"},
-    {text:"Tidy living room, sweep floor",kid:"Truman"},
-  ],
 };
-const EMOJIS=["⭐","🌟","✨","🎉","🏆","🔥","💫","🎊"];
-const todayName=new Date().toLocaleDateString("en-US",{weekday:"long"});
-let activeDay=DAYS.includes(todayName)?todayName:"Monday";
+
+// ── STATE ─────────────────────────────────────────────────────
+let CHORES=JSON.parse(JSON.stringify(DEFAULT_CHORES));
 let checked={};
 let stars={Truman:0,Abby:0,Elizabeth:0,Jack:0};
 let streaks={Truman:0,Abby:0,Elizabeth:0,Jack:0};
 let allowanceEarned={Truman:false,Abby:false,Elizabeth:false,Jack:false};
 let claimedRewards={Truman:[],Abby:[],Elizabeth:[],Jack:[]};
+let extraChores={Sunday:[],Monday:[],Tuesday:[],Wednesday:[],Thursday:[],Friday:[],Saturday:[]};
 let kidFilter=null;
+let isAdmin=false;
+let isSyncing=false;
+
+const todayName=new Date().toLocaleDateString("en-US",{weekday:"long"});
+let activeDay=DAYS.includes(todayName)?todayName:"Sunday";
+
+function kidObj(n){return KIDS.find(k=>k.name===n)||KIDS[0];}
+
+// ── SUPABASE SYNC ─────────────────────────────────────────────
+function setSyncStatus(status){
+  const dot=document.getElementById('sync-dot');
+  if(!dot)return;
+  dot.className='sync-dot'+(status==='syncing'?' syncing':status==='error'?' error':'');
+  dot.title=status==='syncing'?'Syncing...':status==='error'?'Sync error':'Synced ✓';
+}
+
+async function pushState(){
+  setSyncStatus('syncing');
+  const payload={
+    checked,stars,streaks,allowanceEarned,claimedRewards,extraChores,CHORES
+  };
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${ROW_ID}`,{
+      method:'PATCH',
+      headers:{
+        'apikey':SUPABASE_KEY,
+        'Authorization':'Bearer '+SUPABASE_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify({data:JSON.stringify(payload)})
+    });
+    if(res.status===404||res.status===0){
+      // Row doesn't exist yet, insert it
+      await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`,{
+        method:'POST',
+        headers:{
+          'apikey':SUPABASE_KEY,
+          'Authorization':'Bearer '+SUPABASE_KEY,
+          'Content-Type':'application/json',
+          'Prefer':'return=minimal'
+        },
+        body:JSON.stringify({id:ROW_ID,data:JSON.stringify(payload)})
+      });
+    }
+    setSyncStatus('ok');
+  }catch(e){
+    setSyncStatus('error');
+    // Fall back to localStorage
+    try{localStorage.setItem('chore_backup',JSON.stringify(payload));}catch(e2){}
+  }
+}
+
+async function pullState(){
+  setSyncStatus('syncing');
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${ROW_ID}&select=data`,{
+      headers:{
+        'apikey':SUPABASE_KEY,
+        'Authorization':'Bearer '+SUPABASE_KEY,
+      }
+    });
+    const rows=await res.json();
+    if(rows&&rows.length>0&&rows[0].data){
+      const s=JSON.parse(rows[0].data);
+      if(s.checked)checked=s.checked;
+      if(s.stars)stars=s.stars;
+      if(s.streaks)streaks=s.streaks;
+      if(s.allowanceEarned)allowanceEarned=s.allowanceEarned;
+      if(s.claimedRewards)claimedRewards=s.claimedRewards;
+      if(s.extraChores)extraChores=s.extraChores;
+      if(s.CHORES)CHORES=s.CHORES;
+    }
+    setSyncStatus('ok');
+  }catch(e){
+    setSyncStatus('error');
+    // Try localStorage fallback
+    try{
+      const b=localStorage.getItem('chore_backup');
+      if(b){const s=JSON.parse(b);if(s.checked)checked=s.checked;if(s.stars)stars=s.stars;}
+    }catch(e2){}
+  }
+  renderAll();
+}
+
+// Poll for updates every 30 seconds
+setInterval(pullState,30000);
+
+// ── HELPERS ───────────────────────────────────────────────────
+function getWeekDates(){
+  const now=new Date(),dow=now.getDay(),sunday=new Date(now);
+  sunday.setDate(now.getDate()-dow);
+  return DAYS.map((_,i)=>{const d=new Date(sunday);d.setDate(sunday.getDate()+i);return d;});
+}
+function formatShort(d){return (d.getMonth()+1)+"/"+d.getDate();}
+function getDeadline(day){
+  return WEEKEND_DAYS.includes(day)?{hour:10,min:0,label:"10:00 AM"}:{hour:18,min:30,label:"6:30 PM"};
+}
+function showToast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3500);
+}
+function kidObj(n){return KIDS.find(k=>k.name===n)||KIDS[0];}
+const EMOJIS2=["⭐","🌟","✨","🎉","🏆","🔥","💫","🎊"];
+function spawnPop(el){
+  const r=el.getBoundingClientRect(),div=document.createElement("div");
+  div.className="pop";div.textContent=EMOJIS2[Math.floor(Math.random()*EMOJIS2.length)];
+  div.style.left=(r.left+r.width/2-14)+"px";div.style.top=(r.top+window.scrollY-10)+"px";
+  document.body.appendChild(div);setTimeout(()=>div.remove(),950);
+}
+function launchConfetti(color){
+  const colors=[color,"#f59e0b","#22c55e","#ec4899","#8b5cf6","#3b82f6"];
+  for(let i=0;i<50;i++){
+    const d=document.createElement("div");d.className="conf";
+    d.style.cssText=`left:${Math.random()*100}vw;top:0;background:${colors[i%colors.length]};animation-delay:${Math.random()*0.5}s;animation-duration:${0.9+Math.random()*0.7}s`;
+    document.body.appendChild(d);setTimeout(()=>d.remove(),1800);
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(t){
+  ["chart","board","rewards"].forEach(x=>document.getElementById("tab-"+x).classList.toggle("hidden",x!==t));
+  document.querySelectorAll(".tab").forEach((el,i)=>el.classList.toggle("active",["chart","board","rewards","admin"][i]===t));
+  if(t==="board")renderLeaderboard();
+  if(t==="rewards")renderRewards();
+}
+
+// ── WEEK / DAY ────────────────────────────────────────────────
+function buildWeekLabel(){
+  const dates=getWeekDates();
+  document.getElementById("week-label").textContent="Week of "+formatShort(dates[0])+" – "+formatShort(dates[6]);
+}
+function buildDayRow(){
+  const dates=getWeekDates();
+  document.getElementById("dayrow").innerHTML=DAYS.map((d,i)=>{
+    const dl=getDeadline(d);
+    return `<button class="daybtn${d===activeDay?" active":""}" onclick="selectDay('${d}')" style="display:flex;flex-direction:column;align-items:center;line-height:1.3">
+      <span>${d.slice(0,3)}</span>
+      <span style="font-size:10px;opacity:0.75">${formatShort(dates[i])}</span>
+      <span style="font-size:9px;opacity:0.6">by ${dl.label}</span>
+    </button>`;
+  }).join("");
+}
+function selectDay(d){activeDay=d;buildDayRow();renderChores();updateProgress();checkReminder();renderExtraChoresPanel();}
+
+// ── REMINDER ──────────────────────────────────────────────────
+function checkReminder(){
+  const now=new Date(),hour=now.getHours(),min=now.getMinutes();
+  const banner=document.getElementById("reminder-banner");
+  const dl=getDeadline(activeDay);
+  const allC=CHORES[activeDay]||[];
+  const extras=extraChores[activeDay]||[];
+  const remaining=allC.filter((_,i)=>!checked[activeDay+"-"+i]).length
+    +extras.filter((_,i)=>!checked[activeDay+"-extra-"+i]).length;
+  const isPast=hour>dl.hour||(hour===dl.hour&&min>=dl.min);
+  const isSoon=!isPast&&(hour===dl.hour-1||(dl.hour===10&&hour===9));
+  if(remaining===0){banner.innerHTML="";return;}
+  if(isPast){
+    const names=[...new Set(allC.filter((_,i)=>!checked[activeDay+"-"+i]).map(c=>c.kid))];
+    banner.innerHTML=`<div class="reminder" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">
+      <span style="font-size:20px">🚨</span>
+      <div class="reminder-txt">Deadline passed! <strong>${remaining} chore${remaining!==1?"s":""}</strong> undone for ${names.join(", ")}. Due by ${dl.label}!</div>
+      <button class="reminder-close" onclick="this.closest('.reminder').remove()">✕</button></div>`;
+  } else if(isSoon){
+    const names=[...new Set(allC.filter((_,i)=>!checked[activeDay+"-"+i]).map(c=>c.kid))];
+    banner.innerHTML=`<div class="reminder">
+      <span style="font-size:20px">⏰</span>
+      <div class="reminder-txt">Heads up! Chores due by <strong>${dl.label}</strong> — ${remaining} left for ${names.join(", ")}.</div>
+      <button class="reminder-close" onclick="this.closest('.reminder').remove()">✕</button></div>`;
+  } else {banner.innerHTML="";}
+}
+setInterval(checkReminder,60000);
+
+// ── SCORE ROW ─────────────────────────────────────────────────
 function weeklyTotals(){
   const totals={},done={};
   KIDS.forEach(k=>{totals[k.name]=0;done[k.name]=0;});
   DAYS.forEach(day=>{
-    (CHORES[day]||[]).forEach((c,i)=>{
-      totals[c.kid]=(totals[c.kid]||0)+1;
-      if(checked[day+"-"+i])done[c.kid]=(done[c.kid]||0)+1;
-    });
-    (extraChores[day]||[]).forEach((c,i)=>{
-      totals[c.kid]=(totals[c.kid]||0)+1;
-      if(checked[day+"-extra-"+i])done[c.kid]=(done[c.kid]||0)+1;
-    });
+    (CHORES[day]||[]).forEach((c,i)=>{totals[c.kid]=(totals[c.kid]||0)+1;if(checked[day+"-"+i])done[c.kid]=(done[c.kid]||0)+1;});
+    (extraChores[day]||[]).forEach((c,i)=>{totals[c.kid]=(totals[c.kid]||0)+1;if(checked[day+"-extra-"+i])done[c.kid]=(done[c.kid]||0)+1;});
   });
   return {totals,done};
 }
-function checkAllowance(kidName){
-  const {totals,done}=weeklyTotals();
-  if(done[kidName]===totals[kidName]&&totals[kidName]>0&&!allowanceEarned[kidName]){
-    allowanceEarned[kidName]=true;
-    launchConfetti(kidObj(kidName).color);
-    setTimeout(()=>showToast("💰 "+kidName+" completed ALL chores this week — allowance earned!"),400);
-  }
-  if(done[kidName]<totals[kidName])allowanceEarned[kidName]=false;
-}
-function kidObj(n){return KIDS.find(k=>k.name===n)||KIDS[0];}
-function showTab(t){
-  ["chart","board","rewards"].forEach(x=>document.getElementById("tab-"+x).classList.toggle("hidden",x!==t));
-  document.querySelectorAll(".tab").forEach((el,i)=>el.classList.toggle("active",["chart","board","rewards"][i]===t));
-  if(t==="board")renderLeaderboard();
-  if(t==="rewards")renderRewards();
-}
-function selectDay(d){activeDay=d;buildDayRow();renderChores();updateProgress();checkReminder();renderExtraChoresPanel();}
 function renderScoreRow(){
   const {totals,done}=weeklyTotals();
   document.getElementById("scorerow").innerHTML=KIDS.map(k=>{
-    const s=stars[k.name],claimed=claimedRewards[k.name]||[];
+    const s=stars[k.name]||0,claimed=claimedRewards[k.name]||[];
     const next=THRESHOLDS.find(t=>t.stars>s&&!claimed.includes(t.stars));
-    const pct=next?Math.round(s/next.stars*100):100;
-    const isF=kidFilter===k.name;
+    const pct=next?Math.round(s/next.stars*100):100,isF=kidFilter===k.name;
     const wDone=done[k.name]||0,wTotal=totals[k.name]||1,wPct=Math.round(wDone/wTotal*100);
     const earned=allowanceEarned[k.name];
     return `<div class="scard${isF?" active-filter":""}" style="border-color:${earned?"#22c55e":isF?k.color:k.color+"33"}" onclick="filterKid('${k.name}')">
@@ -296,11 +476,13 @@ function renderScoreRow(){
       <div class="sstar" style="color:${k.color}">${s} &#9733;</div>
       ${earned?'<div class="streak" style="background:#dcfce7;color:#15803d">💰 Allowance!</div>':streaks[k.name]>=2?'<div class="streak">🔥 '+streaks[k.name]+' day streak</div>':""}
       <div style="font-size:10px;color:#999;margin-top:5px;font-weight:600">Week: ${wDone}/${wTotal}</div>
-      <div class="sbar" title="Weekly chore progress"><div class="sbar-fill" style="width:${wPct}%;background:${earned?"#22c55e":k.color}"></div></div>
+      <div class="sbar"><div class="sbar-fill" style="width:${wPct}%;background:${earned?"#22c55e":k.color}"></div></div>
     </div>`;
   }).join("");
 }
 function filterKid(name){kidFilter=kidFilter===name?null:name;renderScoreRow();renderChores();}
+
+// ── CHORES ────────────────────────────────────────────────────
 function renderChores(){
   const all=CHORES[activeDay]||[],groups={};
   KIDS.forEach(k=>{groups[k.name]=[];});
@@ -325,207 +507,43 @@ function renderChores(){
   document.getElementById("chore-list").innerHTML=html;
 }
 function updateProgress(){
-  const all=CHORES[activeDay]||[];
-  const extras=extraChores[activeDay]||[];
-  const done=all.filter((_,i)=>checked[activeDay+"-"+i]).length
-    +extras.filter((_,i)=>checked[activeDay+"-extra-"+i]).length;
-  const tot=all.length+extras.length;
-  const pct=tot>0?Math.round(done/tot*100):0;
+  const all=CHORES[activeDay]||[],extras=extraChores[activeDay]||[];
+  const done=all.filter((_,i)=>checked[activeDay+"-"+i]).length+extras.filter((_,i)=>checked[activeDay+"-extra-"+i]).length;
+  const tot=all.length+extras.length,pct=tot>0?Math.round(done/tot*100):0;
   document.getElementById("prog-lbl").textContent=`${done} / ${tot} done`;
   document.getElementById("prog-fill").style.width=pct+"%";
   document.getElementById("prog-pct").textContent=pct+"%";
   document.getElementById("prog-fill").style.background=pct===100?"#22c55e":"#7d3c98";
 }
+
+function checkMilestone(kidName,s){
+  const hit=THRESHOLDS.find(t=>t.stars===s);if(!hit)return;
+  launchConfetti(kidObj(kidName).color);
+  setTimeout(()=>showToast("🎉 "+kidName+" unlocked: "+hit.reward),400);
+}
+function checkAllowance(kidName){
+  const {totals,done}=weeklyTotals();
+  if(done[kidName]===totals[kidName]&&totals[kidName]>0&&!allowanceEarned[kidName]){
+    allowanceEarned[kidName]=true;
+    launchConfetti(kidObj(kidName).color);
+    setTimeout(()=>showToast("💰 "+kidName+" completed ALL chores — allowance earned!"),400);
+  }
+  if(done[kidName]<totals[kidName])allowanceEarned[kidName]=false;
+}
+
 function toggleChore(key,kidName){
   const el=document.querySelector(`.chore[onclick="toggleChore('${key}','${kidName}')"]`);
   const wasDone=!!checked[key];
   checked[key]=!wasDone;
   stars[kidName]=Math.max(0,(stars[kidName]||0)+(wasDone?-1:1));
-  if(el){
-    el.classList.toggle("done",!wasDone);
-    el.querySelector(".chk").textContent=!wasDone?"✓":"";
-    if(!wasDone)spawnPop(el);
-  }
-  if(!wasDone)checkMilestone(kidName,stars[kidName]);
-  checkAllowance(kidName);
+  if(el){el.classList.toggle("done",!wasDone);el.querySelector(".chk").textContent=!wasDone?"✓":"";if(!wasDone)spawnPop(el);}
+  if(!wasDone){checkMilestone(kidName,stars[kidName]);checkAllowance(kidName);}
   renderScoreRow();updateProgress();
-  if(el){
-    const kg=el.closest(".kgroup");
-    if(kg){const a=kg.querySelectorAll(".chore"),d=[...a].filter(c=>c.classList.contains("done")).length;kg.querySelector(".kcount").textContent=`${d}/${a.length}`;}
-  }
-}
-function spawnPop(el){
-  const r=el.getBoundingClientRect(),div=document.createElement("div");
-  div.className="pop";div.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
-  div.style.left=(r.left+r.width/2-14)+"px";div.style.top=(r.top+window.scrollY-10)+"px";
-  document.body.appendChild(div);setTimeout(()=>div.remove(),950);
-}
-function showToast(msg){
-  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),3500);
-}
-function checkMilestone(kidName,s){
-  const hit=THRESHOLDS.find(t=>t.stars===s);
-  if(!hit)return;
-  if(claimedRewards[kidName].includes(t=>t===hit.stars))return;
-  launchConfetti(kidObj(kidName).color);
-  setTimeout(()=>showToast("🎉 "+kidName+" unlocked: "+hit.reward),400);
-}
-function claimReward(kidName,rewardStars){
-  stars[kidName]=Math.max(0,stars[kidName]-rewardStars);
-  showToast("✅ "+kidName+" used "+rewardStars+"★ — "+stars[kidName]+"★ remaining!");
-  renderScoreRow();
-  renderRewards();
-}
-function launchConfetti(color){
-  const colors=[color,"#f59e0b","#22c55e","#ec4899","#8b5cf6","#3b82f6"];
-  for(let i=0;i<50;i++){
-    const d=document.createElement("div");d.className="conf";
-    d.style.cssText=`left:${Math.random()*100}vw;top:0;background:${colors[i%colors.length]};animation-delay:${Math.random()*0.5}s;animation-duration:${0.9+Math.random()*0.7}s`;
-    document.body.appendChild(d);setTimeout(()=>d.remove(),1800);
-  }
-}
-function renderLeaderboard(){
-  const sorted=[...KIDS].sort((a,b)=>(stars[b.name]||0)-(stars[a.name]||0));
-  const maxS=Math.max(...sorted.map(k=>stars[k.name]||0),1);
-  const medals=["🥇","🥈","🥉","4️⃣"];
-  document.getElementById("leaderboard").innerHTML=sorted.map((k,i)=>{
-    const s=stars[k.name]||0;
-    return `<div class="lrow"><div class="lrank">${medals[i]}</div>
-      <div class="lavatar" style="background:${k.light};color:${k.color}">${k.name[0]}</div>
-      <div class="lname">${k.name}</div>
-      <div class="lbar-wrap"><div class="lbar" style="width:${Math.round(s/maxS*100)}%;background:${k.color}"></div></div>
-      <div class="lscore" style="color:${k.color}">${s} ★</div></div>`;
-  }).join("");
-}
-function renderRewards(){
-  const {totals,done}=weeklyTotals();
-  let html=`<div style="background:#fff;border-radius:16px;padding:16px 18px;margin-bottom:20px;border:2px solid #86efac;box-shadow:0 2px 12px rgba(34,197,94,0.1)">
-    <div style="font-size:15px;font-weight:700;color:#15803d;margin-bottom:12px">💰 Weekly Allowance</div>
-    <div style="font-size:13px;color:#555;margin-bottom:14px">Complete <strong>every single chore all week</strong> to earn your allowance!</div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">`;
-  KIDS.forEach(k=>{
-    const wDone=done[k.name]||0,wTotal=totals[k.name]||1,wPct=Math.round(wDone/wTotal*100),earned=allowanceEarned[k.name];
-    html+=`<div style="background:${earned?"#f0fdf4":"#f9f9f9"};border-radius:12px;padding:12px;border:1.5px solid ${earned?"#86efac":"#eee"}">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <div style="width:26px;height:26px;border-radius:50%;background:${k.light};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${k.color}">${k.name[0]}</div>
-        <span style="font-size:13px;font-weight:700;color:${earned?"#15803d":k.color}">${k.name}</span>
-        ${earned?'<span style="font-size:16px;margin-left:auto">💰</span>':''}
-      </div>
-      <div style="font-size:11px;color:#888;margin-bottom:5px">${wDone} of ${wTotal} chores done (${wPct}%)</div>
-      <div style="height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden">
-        <div style="height:100%;width:${wPct}%;background:${earned?"#22c55e":k.color};border-radius:99px;transition:width 0.4s"></div>
-      </div>
-      ${earned?'<div style="font-size:11px;font-weight:700;color:#15803d;margin-top:6px">All chores complete! Allowance earned!</div>':'<div style="font-size:11px;color:#aaa;margin-top:6px">'+(wTotal-wDone)+' chore'+(wTotal-wDone!==1?"s":"")+" left this week</div>"}
-    </div>`;
-  });
-  html+=`</div></div>`;
-
-  // Star note
-  html+=`<div style="background:#fff8e1;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#92400e;border:1.5px solid #fde68a">
-    ⭐ <strong>Stars carry over week to week!</strong> When you use a reward, those stars are deducted and your remaining balance keeps building toward the next one.
-  </div>`;
-
-  KIDS.forEach(k=>{
-    const s=stars[k.name]||0;
-    const claimed=claimedRewards[k.name]||[];
-    const nextIdx=THRESHOLDS.findIndex(t=>t.stars>s&&!claimed.includes(t.stars));
-    html+=`<div class="reward-section"><div class="rsec-title">
-      <div style="width:28px;height:28px;border-radius:50%;background:${k.light};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${k.color}">${k.name[0]}</div>
-      ${k.name} &mdash; <span style="color:${k.color}">${s} &#9733; total</span></div>`;
-    THRESHOLDS.forEach((t,i)=>{
-      const unlocked=s>=t.stars;
-      const isClaimed=claimed.includes(t.stars);
-      const isNext=!isClaimed&&THRESHOLDS.filter(x=>!claimed.includes(x.stars)).findIndex(x=>x.stars>s)===THRESHOLDS.filter(x=>!claimed.includes(x.stars)).indexOf(t);
-      html+=`<div class="ritem${isClaimed?" unlocked":unlocked&&!isClaimed?" unlocked":""}">
-        <div class="rbadge" style="background:${isClaimed?"#e0e7ff":unlocked?"#dcfce7":k.light+"88"};color:${isClaimed?"#6366f1":unlocked?"#15803d":k.color};${!unlocked?"opacity:0.5":""}">${isClaimed?"★":unlocked?"✓":t.stars}</div>
-        <div style="flex:1">
-          <div class="rlabel" style="${isClaimed?"text-decoration:line-through;color:#999":""}">${t.stars} &#9733; — ${t.reward}</div>
-          ${isClaimed?'<div class="rsub" style="color:#6366f1">✅ Reward used</div>':unlocked?'<div class="rsub" style="color:#15803d">Unlocked! Ready to claim</div>':s>0?`<div class="rsub">${t.stars-s} more stars to go</div>`:""}
-        </div>
-        ${isClaimed?"":`${unlocked?`<button onclick="claimReward('${k.name}',${t.stars})" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Mark Used</button>`:'<span style="font-size:13px;opacity:0.3">🔒</span>'}`}
-      </div>`;
-    });
-    html+=`</div>`;
-  });
-  document.getElementById("rewards-content").innerHTML=html;
-}
-// --- Week dates ---
-function getWeekDates(){
-  const now=new Date();
-  const dow=now.getDay(); // 0=Sun
-  const sunday=new Date(now);
-  sunday.setDate(now.getDate()-dow);
-  return DAYS.map((_,i)=>{
-    const d=new Date(sunday);d.setDate(sunday.getDate()+i);
-    return d;
-  });
-}
-function formatShort(d){return (d.getMonth()+1)+"/"+d.getDate();}
-function buildWeekLabel(){
-  const dates=getWeekDates();
-  const start=formatShort(dates[0]),end=formatShort(dates[6]);
-  document.getElementById("week-label").textContent="Week of "+start+" – "+end;
-}
-function buildDayRow(){
-  const dates=getWeekDates();
-  document.getElementById("dayrow").innerHTML=DAYS.map((d,i)=>{
-    const dateStr=formatShort(dates[i]);
-    const dl=getDeadline(d);
-    return `<button class="daybtn${d===activeDay?" active":""}" onclick="selectDay('${d}')" style="display:flex;flex-direction:column;align-items:center;padding:6px 10px;line-height:1.2">
-      <span>${d.slice(0,3)}</span>
-      <span style="font-size:10px;opacity:0.75">${dateStr}</span>
-      <span style="font-size:9px;opacity:0.65">by ${dl.label}</span>
-    </button>`;
-  }).join("");
+  if(el){const kg=el.closest(".kgroup");if(kg){const a=kg.querySelectorAll(".chore"),d=[...a].filter(c=>c.classList.contains("done")).length;kg.querySelector(".kcount").textContent=`${d}/${a.length}`;}}
+  pushState();
 }
 
-// --- Deadline-aware reminder banner ---
-const WEEKEND_DAYS=["Saturday","Sunday"];
-function getDeadline(day){
-  return WEEKEND_DAYS.includes(day)?{hour:10,min:0,label:"10:00 AM"}:{hour:18,min:30,label:"6:30 PM"};
-}
-function checkReminder(){
-  const now=new Date();
-  const hour=now.getHours(),min=now.getMinutes();
-  const banner=document.getElementById("reminder-banner");
-  const dl=getDeadline(activeDay);
-  const allChores=CHORES[activeDay]||[];
-  const extraList=extraChores[activeDay]||[];
-  const allItems=[...allChores,...extraList];
-  const doneCount=allChores.filter((_,i)=>checked[activeDay+"-"+i]).length
-    +extraList.filter((_,i)=>checked[activeDay+"-extra-"+i]).length;
-  const remaining=allItems.length-doneCount;
-  const isPastDeadline=hour>dl.hour||(hour===dl.hour&&min>=dl.min);
-  const isApproaching=!isPastDeadline&&(hour===dl.hour-1||(dl.hour===10&&hour===9));
-
-  if(remaining===0){banner.innerHTML="";return;}
-
-  if(isPastDeadline&&remaining>0){
-    const names=[...new Set([
-      ...allChores.filter((_,i)=>!checked[activeDay+"-"+i]).map(c=>c.kid),
-      ...extraList.filter((_,i)=>!checked[activeDay+"-extra-"+i]).map(c=>c.kid)
-    ])];
-    banner.innerHTML=`<div class="reminder" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">
-      <span style="font-size:20px">🚨</span>
-      <div class="reminder-txt">Deadline passed! <strong>${remaining} chore${remaining!==1?"s":""}</strong> still undone for ${names.join(", ")}. Chores were due by ${dl.label}!</div>
-      <button class="reminder-close" onclick="document.getElementById('reminder-banner').innerHTML=''">✕</button>
-    </div>`;
-  } else if(isApproaching){
-    const names=[...new Set(allChores.filter((_,i)=>!checked[activeDay+"-"+i]).map(c=>c.kid))];
-    banner.innerHTML=`<div class="reminder">
-      <span style="font-size:20px">⏰</span>
-      <div class="reminder-txt">Heads up! Chores due by <strong>${dl.label}</strong> — ${remaining} left for ${names.join(", ")}.</div>
-      <button class="reminder-close" onclick="document.getElementById('reminder-banner').innerHTML=''">✕</button>
-    </div>`;
-  } else {
-    banner.innerHTML="";
-  }
-}
-
-// --- Extra chores system ---
-let extraChores={Monday:[],Tuesday:[],Wednesday:[],Thursday:[],Friday:[],Saturday:[],Sunday:[]};
-
+// ── EXTRA CHORES (WEEKENDS) ───────────────────────────────────
 function renderExtraChoresPanel(){
   const isWeekend=WEEKEND_DAYS.includes(activeDay);
   const panel=document.getElementById("extra-chores-panel");
@@ -541,29 +559,28 @@ function renderExtraChoresPanel(){
         <div class="chk">${isDone?"✓":""}</div>
         <span class="chore-txt">${c.text}</span>
         <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:${kid.light};color:${kid.color};flex-shrink:0">${c.kid}</span>
-        <button onclick="event.stopPropagation();removeExtra('${activeDay}',${i})" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;padding:0 4px;flex-shrink:0">✕</button>
+        ${isAdmin?`<button onclick="event.stopPropagation();removeExtra('${activeDay}',${i})" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;padding:0 4px;flex-shrink:0">✕</button>`:""}
       </div>`;
     });
     html+=`</div>`;
   }
-  html+=`<div style="background:#f9f5ff;border-radius:12px;padding:12px;border:1.5px solid #e8daef">
-    <div style="font-size:12px;font-weight:700;color:#7d3c98;margin-bottom:8px">Add a bonus chore:</div>
-    <input id="extra-text" type="text" placeholder="e.g. Vacuum upstairs" style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid #ddd;font-size:13px;font-family:inherit;margin-bottom:8px;outline:none">
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-      ${KIDS.map(k=>`<button onclick="setExtraKid('${k.name}')" id="ek-${k.name}" style="padding:5px 12px;border-radius:99px;border:2px solid ${k.color};background:white;color:${k.color};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s">${k.name}</button>`).join("")}
-    </div>
-    <button onclick="addExtra()" style="width:100%;padding:9px;border-radius:8px;background:#7d3c98;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Add Bonus Chore ★</button>
-  </div></div>`;
+  if(isAdmin){
+    html+=`<div style="background:#f9f5ff;border-radius:12px;padding:12px;border:1.5px solid #e8daef">
+      <div style="font-size:12px;font-weight:700;color:#7d3c98;margin-bottom:8px">Add a bonus chore:</div>
+      <input id="extra-text" type="text" placeholder="e.g. Vacuum upstairs" style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid #ddd;font-size:13px;font-family:inherit;margin-bottom:8px;outline:none">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        ${KIDS.map(k=>`<button onclick="setExtraKid('${k.name}')" id="ek-${k.name}" style="padding:5px 12px;border-radius:99px;border:2px solid ${k.color};background:white;color:${k.color};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">${k.name}</button>`).join("")}
+      </div>
+      <button onclick="addExtra()" style="width:100%;padding:9px;border-radius:8px;background:#7d3c98;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Add Bonus Chore ★</button>
+    </div>`;
+  }
+  html+=`</div>`;
   panel.innerHTML=html;
 }
-
 let selectedExtraKid=null;
 function setExtraKid(name){
   selectedExtraKid=name;
-  KIDS.forEach(k=>{
-    const btn=document.getElementById("ek-"+k.name);
-    if(btn){btn.style.background=k.name===name?kidObj(k.name).color:"white";btn.style.color=k.name===name?"#fff":kidObj(k.name).color;}
-  });
+  KIDS.forEach(k=>{const btn=document.getElementById("ek-"+k.name);if(btn){btn.style.background=k.name===name?kidObj(k.name).color:"white";btn.style.color=k.name===name?"#fff":kidObj(k.name).color;}});
 }
 function addExtra(){
   const txt=document.getElementById("extra-text").value.trim();
@@ -572,55 +589,98 @@ function addExtra(){
   if(!extraChores[activeDay])extraChores[activeDay]=[];
   extraChores[activeDay].push({text:txt,kid:selectedExtraKid});
   selectedExtraKid=null;
-  renderExtraChoresPanel();
-  updateProgress();
-  renderScoreRow();
+  renderExtraChoresPanel();updateProgress();renderScoreRow();pushState();
 }
 function removeExtra(day,idx){
   const key=day+"-extra-"+idx;
   if(checked[key]){stars[extraChores[day][idx].kid]=Math.max(0,stars[extraChores[day][idx].kid]-1);}
   delete checked[key];
   extraChores[day].splice(idx,1);
-  // re-key remaining
-  extraChores[day].forEach((_,i)=>{
-    const oldKey=day+"-extra-"+(i+1),newKey=day+"-extra-"+i;
-    if(checked[oldKey]){checked[newKey]=true;delete checked[oldKey];}
-  });
-  renderExtraChoresPanel();
-  updateProgress();
-  renderScoreRow();
+  renderExtraChoresPanel();updateProgress();renderScoreRow();pushState();
 }
 function toggleExtra(day,idx,kidName){
   const key=day+"-extra-"+idx,wasDone=!!checked[key];
   checked[key]=!wasDone;
   stars[kidName]=Math.max(0,(stars[kidName]||0)+(wasDone?-1:1));
-  if(!wasDone){
-    checkMilestone(kidName,stars[kidName]);
-    checkAllowance(kidName);
-  }
-  renderExtraChoresPanel();
-  updateProgress();
-  renderScoreRow();
+  if(!wasDone){checkMilestone(kidName,stars[kidName]);checkAllowance(kidName);}
+  renderExtraChoresPanel();updateProgress();renderScoreRow();pushState();
 }
 
-// --- Save week summary ---
-function saveWeek(){
-  const dates=getWeekDates();
+// ── LEADERBOARD ───────────────────────────────────────────────
+function renderLeaderboard(){
+  const sorted=[...KIDS].sort((a,b)=>(stars[b.name]||0)-(stars[a.name]||0));
+  const maxS=Math.max(...sorted.map(k=>stars[k.name]||0),1);
+  const medals=["🥇","🥈","🥉","4️⃣"];
+  document.getElementById("leaderboard").innerHTML=sorted.map((k,i)=>{
+    const s=stars[k.name]||0;
+    return `<div class="lrow"><div class="lrank">${medals[i]}</div>
+      <div class="lavatar" style="background:${k.light};color:${k.color}">${k.name[0]}</div>
+      <div class="lname">${k.name}</div>
+      <div class="lbar-wrap"><div class="lbar" style="width:${Math.round(s/maxS*100)}%;background:${k.color}"></div></div>
+      <div class="lscore" style="color:${k.color}">${s} &#9733;</div></div>`;
+  }).join("");
+}
+
+// ── REWARDS ───────────────────────────────────────────────────
+function claimReward(kidName,rewardStars){
+  stars[kidName]=Math.max(0,stars[kidName]-rewardStars);
+  showToast("✅ "+kidName+" used "+rewardStars+"★ — "+stars[kidName]+"★ remaining!");
+  renderScoreRow();renderRewards();pushState();
+}
+function renderRewards(){
   const {totals,done}=weeklyTotals();
-  const weekStr=formatShort(dates[0])+" - "+formatShort(dates[6]);
-  let txt="FAMILY CHORE CHART — Week of "+weekStr+"\n";
-  txt+="=".repeat(50)+"\n\n";
+  let html=`<div style="background:#fff;border-radius:16px;padding:16px 18px;margin-bottom:20px;border:2px solid #86efac;box-shadow:0 2px 12px rgba(34,197,94,0.1)">
+    <div style="font-size:15px;font-weight:700;color:#15803d;margin-bottom:12px">💰 Weekly Allowance</div>
+    <div style="font-size:13px;color:#555;margin-bottom:14px">Complete <strong>every single chore all week</strong> to earn your allowance!</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">`;
+  KIDS.forEach(k=>{
+    const wDone=done[k.name]||0,wTotal=totals[k.name]||1,wPct=Math.round(wDone/wTotal*100),earned=allowanceEarned[k.name];
+    html+=`<div style="background:${earned?"#f0fdf4":"#f9f9f9"};border-radius:12px;padding:12px;border:1.5px solid ${earned?"#86efac":"#eee"}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:26px;height:26px;border-radius:50%;background:${k.light};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${k.color}">${k.name[0]}</div>
+        <span style="font-size:13px;font-weight:700;color:${earned?"#15803d":k.color}">${k.name}</span>
+        ${earned?'<span style="font-size:16px;margin-left:auto">💰</span>':''}
+      </div>
+      <div style="font-size:11px;color:#888;margin-bottom:5px">${wDone} of ${wTotal} done (${wPct}%)</div>
+      <div style="height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="height:100%;width:${wPct}%;background:${earned?"#22c55e":k.color};border-radius:99px"></div></div>
+      ${earned?'<div style="font-size:11px;font-weight:700;color:#15803d;margin-top:6px">Allowance earned!</div>':'<div style="font-size:11px;color:#aaa;margin-top:6px">'+(wTotal-wDone)+' left this week</div>'}
+    </div>`;
+  });
+  html+=`</div></div>
+  <div style="background:#fff8e1;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#92400e;border:1.5px solid #fde68a">
+    ⭐ <strong>Stars carry over week to week!</strong> When you use a reward, those stars are deducted and your balance keeps building.
+  </div>`;
+  KIDS.forEach(k=>{
+    const s=stars[k.name]||0,claimed=claimedRewards[k.name]||[];
+    html+=`<div class="reward-section"><div class="rsec-title">
+      <div style="width:28px;height:28px;border-radius:50%;background:${k.light};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${k.color}">${k.name[0]}</div>
+      ${k.name} &mdash; <span style="color:${k.color}">${s} &#9733; total</span></div>`;
+    THRESHOLDS.forEach((t,i)=>{
+      const unlocked=s>=t.stars;
+      html+=`<div class="ritem${unlocked?" unlocked":""}">
+        <div class="rbadge" style="background:${unlocked?"#dcfce7":"#f5f5f5"};color:${unlocked?"#15803d":"#aaa"};${!unlocked?"opacity:0.5":""}">${unlocked?"✓":t.stars}</div>
+        <div style="flex:1"><div class="rlabel">${t.stars} &#9733; — ${t.reward}</div>
+        ${!unlocked?`<div class="rsub">${t.stars-s} more stars to go</div>`:""}</div>
+        ${unlocked?`<button onclick="claimReward('${k.name}',${t.stars})" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Use ${t.stars}★</button>`:'<span style="font-size:13px;opacity:0.3">🔒</span>'}
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  document.getElementById("rewards-content").innerHTML=html;
+}
+
+// ── SAVE WEEK ─────────────────────────────────────────────────
+function saveWeek(){
+  const dates=getWeekDates(),{totals,done}=weeklyTotals();
+  let txt="FAMILY CHORE CHART — Week of "+formatShort(dates[0])+" - "+formatShort(dates[6])+"\n"+"=".repeat(50)+"\n\n";
   KIDS.forEach(k=>{
     const d=done[k.name]||0,t=totals[k.name]||0,pct=t>0?Math.round(d/t*100):0;
-    txt+=k.name.toUpperCase()+" (age "+k.age+") — "+d+"/"+t+" chores ("+pct+"%) — Stars: "+stars[k.name]+(allowanceEarned[k.name]?" 💰 ALLOWANCE EARNED":"")+"\n";
+    txt+=k.name.toUpperCase()+" — "+d+"/"+t+" chores ("+pct+"%) — Stars: "+stars[k.name]+(allowanceEarned[k.name]?" 💰 ALLOWANCE EARNED":"")+"\n";
   });
   txt+="\nDAILY BREAKDOWN\n"+"-".repeat(50)+"\n";
   DAYS.forEach((day,di)=>{
     txt+="\n"+day+" ("+formatShort(dates[di])+")\n";
-    (CHORES[day]||[]).forEach((c,i)=>{
-      const isDone=checked[day+"-"+i];
-      txt+="  ["+(isDone?"✓":" ")+"] "+c.kid+": "+c.text+"\n";
-    });
+    (CHORES[day]||[]).forEach((c,i)=>txt+="  ["+(checked[day+"-"+i]?"✓":" ")+"] "+c.kid+": "+c.text+"\n");
   });
   txt+="\nStar Totals: "+KIDS.map(k=>k.name+": "+stars[k.name]+"★").join(" | ");
   const blob=new Blob([txt],{type:"text/plain"});
@@ -628,57 +688,112 @@ function saveWeek(){
   a.href=URL.createObjectURL(blob);
   a.download="ChoreChart_"+formatShort(dates[0]).replace("/","-")+"_to_"+formatShort(dates[6]).replace("/","-")+".txt";
   a.click();
-  showToast("📄 Week saved as a text file!");
+  showToast("📄 Week saved!");
 }
 
-buildDayRow();renderScoreRow();renderChores();updateProgress();buildWeekLabel();checkReminder();renderExtraChoresPanel();
-setInterval(checkReminder,60000);
-
-// --- Persist state to localStorage ---
-function saveState(){
-  try{
-    localStorage.setItem('chore_checked',JSON.stringify(checked));
-    localStorage.setItem('chore_stars',JSON.stringify(stars));
-    localStorage.setItem('chore_extra',JSON.stringify(extraChores));
-    localStorage.setItem('chore_claimed',JSON.stringify(claimedRewards));
-    localStorage.setItem('chore_allowance',JSON.stringify(allowanceEarned));
-  }catch(e){}
+// ── ADMIN MODE ────────────────────────────────────────────────
+function showAdminLogin(){
+  const mc=document.getElementById("modal-container");
+  mc.innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h2>⚙️ Parent Admin</h2>
+      <p style="font-size:13px;color:#666;margin-bottom:16px">Enter password to manage chores</p>
+      <input type="password" id="admin-pw" class="admin-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPw()">
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="admin-btn primary" style="flex:1" onclick="checkAdminPw()">Enter</button>
+        <button class="admin-btn" style="background:#f5f5f5;color:#666;flex:1" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>`;
 }
-function loadState(){
-  try{
-    const c=localStorage.getItem('chore_checked');if(c)checked=JSON.parse(c);
-    const s=localStorage.getItem('chore_stars');if(s)stars=JSON.parse(s);
-    const e=localStorage.getItem('chore_extra');if(e)extraChores=JSON.parse(e);
-    const cl=localStorage.getItem('chore_claimed');if(cl)claimedRewards=JSON.parse(cl);
-    const al=localStorage.getItem('chore_allowance');if(al)allowanceEarned=JSON.parse(al);
-  }catch(e){}
+function checkAdminPw(){
+  const pw=document.getElementById("admin-pw").value;
+  if(pw===ADMIN_PASSWORD){isAdmin=true;closeModal();showAdminPanel();}
+  else{showToast("Incorrect password!");}
 }
-loadState();
-renderScoreRow();renderChores();updateProgress();renderExtraChoresPanel();
+function closeModal(){document.getElementById("modal-container").innerHTML="";}
 
-// Patch all state-changing functions to auto-save
-const _orig_toggleChore=toggleChore;
-window.toggleChore=function(key,kidName){_orig_toggleChore(key,kidName);saveState();};
-const _orig_toggleExtra=toggleExtra;
-window.toggleExtra=function(day,idx,kidName){_orig_toggleExtra(day,idx,kidName);saveState();};
-const _orig_claimReward=claimReward;
-window.claimReward=function(kidName,rs){_orig_claimReward(kidName,rs);saveState();};
-const _orig_addExtra=addExtra;
-window.addExtra=function(){_orig_addExtra();saveState();};
-const _orig_removeExtra=removeExtra;
-window.removeExtra=function(day,idx){_orig_removeExtra(day,idx);saveState();};
-
-// --- Service Worker for offline/PWA ---
-if('serviceWorker' in navigator){
-  const sw=`
-    const CACHE='chore-chart-v1';
-    const FILES=['/'];
-    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
-    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
-  `;
-  const blob=new Blob([sw],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+function showAdminPanel(){
+  const mc=document.getElementById("modal-container");
+  mc.innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h2>⚙️ Manage Chores</h2>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        ${DAYS.map(d=>`<button onclick="showAdminDay('${d}')" style="padding:6px 12px;border-radius:99px;border:2px solid #7d3c98;background:${d===activeDay?"#7d3c98":"white"};color:${d===activeDay?"#fff":"#7d3c98"};font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">${d.slice(0,3)}</button>`).join("")}
+      </div>
+      <div id="admin-day-content"></div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid #eee">
+        <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:10px">Add New Chore</div>
+        <select id="admin-day-sel" class="admin-input" style="margin-bottom:8px">
+          ${DAYS.map(d=>`<option value="${d}"${d===activeDay?" selected":""}>${d}</option>`).join("")}
+        </select>
+        <select id="admin-kid-sel" class="admin-input" style="margin-bottom:8px">
+          ${KIDS.map(k=>`<option value="${k.name}">${k.name}</option>`).join("")}
+        </select>
+        <input type="text" id="admin-chore-txt" class="admin-input" placeholder="Chore description...">
+        <button class="admin-btn primary" style="width:100%;margin-top:4px" onclick="adminAddChore()">Add Chore</button>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="admin-btn danger" style="flex:1" onclick="if(confirm('Reset ALL check marks for this week?')){checked={};renderAll();pushState();closeModal();}">Reset Week</button>
+        <button class="admin-btn" style="background:#f5f5f5;color:#555;flex:1" onclick="isAdmin=false;closeModal();renderExtraChoresPanel()">Exit Admin</button>
+      </div>
+    </div>
+  </div>`;
+  showAdminDay(activeDay);
 }
+
+function showAdminDay(day){
+  const chores=CHORES[day]||[];
+  let html=`<div style="font-size:13px;font-weight:700;color:#333;margin-bottom:8px">${day} Chores</div>`;
+  if(!chores.length){html+='<div style="font-size:13px;color:#aaa;padding:8px">No chores for this day</div>';}
+  chores.forEach((c,i)=>{
+    const kid=kidObj(c.kid);
+    html+=`<div class="admin-chore-item">
+      <div style="width:22px;height:22px;border-radius:50%;background:${kid.light};color:${kid.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${c.kid[0]}</div>
+      <span style="flex:1;font-size:12px;color:#333">${c.text}</span>
+      <select onchange="adminChangeKid('${day}',${i},this.value)" style="font-size:11px;border:1px solid #ddd;border-radius:6px;padding:3px;font-family:inherit;margin-right:4px">
+        ${KIDS.map(k=>`<option value="${k.name}"${k.name===c.kid?" selected":""}>${k.name}</option>`).join("")}
+      </select>
+      <button onclick="adminRemoveChore('${day}',${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700">✕</button>
+    </div>`;
+  });
+  const el=document.getElementById("admin-day-content");
+  if(el)el.innerHTML=html;
+}
+
+function adminAddChore(){
+  const day=document.getElementById("admin-day-sel").value;
+  const kid=document.getElementById("admin-kid-sel").value;
+  const txt=document.getElementById("admin-chore-txt").value.trim();
+  if(!txt){showToast("Please enter a chore description!");return;}
+  if(!CHORES[day])CHORES[day]=[];
+  CHORES[day].push({text:txt,kid});
+  document.getElementById("admin-chore-txt").value="";
+  showAdminDay(day);
+  renderChores();updateProgress();pushState();
+  showToast("Chore added to "+day+"!");
+}
+function adminRemoveChore(day,idx){
+  if(!confirm("Remove this chore?"))return;
+  CHORES[day].splice(idx,1);
+  showAdminDay(day);renderChores();updateProgress();pushState();
+  showToast("Chore removed!");
+}
+function adminChangeKid(day,idx,newKid){
+  CHORES[day][idx].kid=newKid;
+  renderChores();pushState();
+  showToast("Reassigned to "+newKid+"!");
+}
+
+// ── RENDER ALL ────────────────────────────────────────────────
+function renderAll(){
+  buildDayRow();renderScoreRow();renderChores();updateProgress();
+  renderExtraChoresPanel();checkReminder();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+buildWeekLabel();
+pullState(); // loads from Supabase, then calls renderAll()
 </script>
 </body>
 </html>
